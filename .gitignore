@@ -7,3 +7,9 @@ gradle-app.setting
 
 /var/log/*
 !/var/log/.gitkeep
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
