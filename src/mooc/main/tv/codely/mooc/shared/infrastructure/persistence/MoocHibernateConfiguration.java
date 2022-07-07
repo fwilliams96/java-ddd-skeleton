@@ -13,9 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -26,21 +24,21 @@ public class MoocHibernateConfiguration {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setHibernateProperties(hibernateProperties());
-        List<Resource> mappingFiles = searchMappingFiles();
+        List<Resource> mappingFiles = searchMappingFiles("mooc");
 
         sessionFactory.setMappingLocations(mappingFiles.toArray(new Resource[mappingFiles.size()]));
 
         return sessionFactory;
     }
 
-    private List<Resource> searchMappingFiles() {
+    private List<Resource> searchMappingFiles(String contextName) {
         String path = "./src/mooc/main/tv/codely/mooc/";
 
-        String[]     modules   = subdirectoriesFor(path);
+        List<String> modules   = subdirectoriesFor(contextName);
         List<String> goodPaths = new ArrayList<>();
 
         for (String module : modules) {
-            String[] files = mappingFilesIn(path + module + "/infrastructure/persistence/hibernate/");
+            String[] files = mappingFilesIn(module + "/infrastructure/persistence/hibernate/");
 
             for (String file : files) {
                 goodPaths.add(path + module + "/infrastructure/persistence/hibernate/" + file);
@@ -50,14 +48,23 @@ public class MoocHibernateConfiguration {
         return goodPaths.stream().map(FileSystemResource::new).collect(Collectors.toList());
     }
 
-    private String[] subdirectoriesFor(String path) {
-        String[] files =  new File(path).list((current, name) -> new File(current, name).isDirectory());
+    private List<String> subdirectoriesFor(String contextName) {
+        String path = "./src/" + contextName + "/main/tv/codely/" + contextName + "/";
+        String[] files = new File(path).list((current, name) -> new File(current, name).isDirectory());
 
         if (null == files) {
-            return new String[0];
+            path = "./main/tv/codely/" + contextName + "/";
+            files = new File(path).list((current, name) -> new File(current, name).isDirectory());
         }
 
-        return files;}
+        if (null == files) {
+            return Collections.emptyList();
+        }
+
+        String finalPath = path;
+
+        return Arrays.stream(files).map(file -> finalPath + file).collect(Collectors.toList());
+    }
 
     private String[] mappingFilesIn(String path) {
         String[] files = new File(path).list((current, name) -> new File(current, name).getName().contains(".hbm.xml"));
@@ -76,15 +83,14 @@ public class MoocHibernateConfiguration {
         dataSource.setUrl(
             "jdbc:mysql://localhost:3306/mooc?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
         dataSource.setUsername("root");
-        dataSource.setPassword("");
+        dataSource.setPassword("Francis_6");
 
         return dataSource;
     }
 
     @Bean
     public PlatformTransactionManager hibernateTransactionManager() {
-        HibernateTransactionManager transactionManager
-            = new HibernateTransactionManager();
+        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(sessionFactory().getObject());
         return transactionManager;
     }
