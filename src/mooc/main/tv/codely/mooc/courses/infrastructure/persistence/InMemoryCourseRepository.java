@@ -8,7 +8,7 @@ import tv.codely.shared.domain.Service;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Service
+//@Service
 public final class InMemoryCourseRepository implements CourseRepository {
     private HashMap<String, Course> courses = new HashMap<>();
 
@@ -18,6 +18,6 @@ public final class InMemoryCourseRepository implements CourseRepository {
     }
 
     public Optional<Course> search(CourseId id) {
-        return Optional.ofNullable(courses.get(id));
+        return Optional.ofNullable(courses.get(id.value()));
     }
 }

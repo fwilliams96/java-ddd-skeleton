@@ -17,8 +17,9 @@ allprojects {
     implementation 'com.vlkan.log4j2:log4j2-logstash-layout:0.19'
 
     // Test
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.2'
-    testCompile "org.mockito:mockito-core:2.+"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.2'
+    testImplementation "org.mockito:mockito-core:2.+"
+    testImplementation 'com.github.javafaker:javafaker:1.0.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
   }
 
@@ -60,9 +61,22 @@ subprojects {
   }
 
   dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.1.8.RELEASE'
+    implementation 'org.hibernate:hibernate-core:5.4.5.Final'
+    implementation 'org.springframework:spring-orm:5.1.10.RELEASE'
+    implementation 'org.apache.tomcat:tomcat-dbcp:9.0.26'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.1.2'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    runtime 'mysql:mysql-connector-java:8.0.17'
+
+    testImplementation rootProject.sourceSets.main.output
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.8.RELEASE'
+
+    if (project.name != "shared") {
+      implementation project(":shared")
+      testImplementation project(":shared").sourceSets.test.output
+    }
   }
 
   bootJar {
@@ -80,7 +94,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.6.RELEASE")
+    classpath('org.springframework.boot:spring-boot-gradle-plugin:2.1.8.RELEASE')
   }
 }
 
@@ -106,12 +120,12 @@ bootJar {
 mainClassName = 'tv.codely.app.Starter'
 
 dependencies {
-  compile("org.springframework.boot:spring-boot-starter-web")
+  implementation('org.springframework.boot:spring-boot-starter-web:2.1.8.RELEASE')
 
-//  implementation project(":shared")
+  implementation project(":shared")
   implementation project(":backoffice")
   implementation project(":mooc")
 
-  testCompile("org.springframework.boot:spring-boot-starter-test")
+  testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.8.RELEASE'
 }
 
