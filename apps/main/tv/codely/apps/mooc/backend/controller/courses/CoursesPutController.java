@@ -6,20 +6,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import tv.codely.mooc.courses.application.create.CourseCreator;
-import tv.codely.mooc.courses.application.create.CreateCourseRequest;
+import tv.codely.mooc.courses.application.create.CreateCourseCommand;
+import tv.codely.shared.domain.bus.command.CommandBus;
+import tv.codely.shared.domain.bus.command.CommandNotRegisteredError;
 
 @RestController
 public final class CoursesPutController {
-    private final CourseCreator creator;
+    private final CommandBus commandBus;
 
-    public CoursesPutController(CourseCreator creator) {
-        this.creator = creator;
+    public CoursesPutController(CommandBus commandBus) {
+        this.commandBus = commandBus;
     }
 
     @PutMapping(value = "/courses/{id}")
-    public ResponseEntity<String> index(@PathVariable String id, @RequestBody Request request) {
-        creator.create(new CreateCourseRequest(id, request.name(), request.duration()));
+    public ResponseEntity<String> index(@PathVariable String id, @RequestBody Request request) throws CommandNotRegisteredError {
+        commandBus.dispatch(new CreateCourseCommand(id, request.name(), request.duration()));
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
