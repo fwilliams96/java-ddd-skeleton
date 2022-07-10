@@ -23,7 +23,7 @@ public class RabbitMqEventBus implements EventBus {
     }
 
     @Override
-    public void publish(List<DomainEvent<?>> events) {
+    public void publish(List<DomainEvent> events) {
         events.forEach(this::publish);
     }
 
